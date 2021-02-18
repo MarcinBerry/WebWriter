@@ -7,6 +7,8 @@ import java.net.URL;
 
 public class WebWriter {
     public byte[] bytes = new byte[0];
+
+
     public boolean read(String url) {
         try (InputStream in = new URL(url).openStream()) {
             bytes = in.readAllBytes();
