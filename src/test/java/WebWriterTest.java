@@ -1,11 +1,9 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WebWriterTest {
     WebWriter webWriter;
@@ -14,6 +12,7 @@ public class WebWriterTest {
     public void beforeAllTests() {
         webWriter = new WebWriter();
     }
+
     @Test
     public void readCorrectURLTest() {
         assertTrue(webWriter.bytes.length == 0);
@@ -28,27 +27,26 @@ public class WebWriterTest {
         assertTrue(webWriter.bytes.length == 0);
     }
     @Test
-    public void saveTest() {
+    public void writeWebTest() {
         String username = System.getProperty("user.name");
-        webWriter.read("https://www.powiatleczynski.pl");
         boolean success = false;
         if(webWriter.read("https://www.powiatleczynski.pl"))
-            success = webWriter.save("C:\\Users\\" + username + "\\Desktop\\Strona\\web.html");
+            success = webWriter.writeWeb("C:\\Users\\" + username + "\\Desktop\\Strona\\web.html");
         assertTrue(success);
     }
 
     @Test
     public void resolveNameTest() {
-        //webWriter.read("https://www.powiatleczynski.pl");
-        try {
-            String hostString = new URL("https://www.powiatleczynski.pl").getHost();
-            int firstDot = hostString.indexOf(".")+1;
-            int lastDot = hostString.lastIndexOf(".");
-            hostString = hostString.substring(firstDot, lastDot);
-            System.out.println(hostString);
+        String hostName = webWriter.getHostName("https://www.powiatleczynski.pl");
+        assertEquals("powiatleczynski", hostName);
+        assertNotEquals("https://www.powiatleczynski.pl", hostName);
+    }
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+    @Test
+    public void getSubpages() {
+        ArrayList<String> subpages = webWriter.getSubpages("https://www.powiatleczynski.pl");
+        assertEquals(subpages.size(), 26);
+
+        //Pattern: <a\s+href\s*=\s*("[^"]*"|[^\d>]*)\s*>
     }
 }

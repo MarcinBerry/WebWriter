@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class WebWriter {
     public byte[] bytes = new byte[0];
@@ -22,7 +23,7 @@ public class WebWriter {
         }
     }
 
-    public boolean save(String fileString) {
+    public boolean writeWeb(String fileString) {
         try (OutputStream out = new FileOutputStream(fileString)) {
             out.write(bytes);
             return true;
@@ -30,6 +31,25 @@ public class WebWriter {
             e.printStackTrace();
             return false;
         }
+    }
 
+    public String getHostName(String urlString) {
+        try {
+            String hostString = new URL(urlString).getHost();
+            int firstDot = hostString.indexOf(".")+1;
+            int lastDot = hostString.lastIndexOf(".");
+            hostString = hostString.substring(firstDot, lastDot);
+            return hostString;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public ArrayList<String> getSubpages(String urlString) {
+        ArrayList<String> subpages = new ArrayList<>();
+
+        return subpages;
     }
 }
