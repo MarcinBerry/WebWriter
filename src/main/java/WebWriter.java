@@ -1,7 +1,9 @@
 import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,9 +39,6 @@ public class WebWriter {
     public String getHostName(String urlString) {
         try {
             String hostString = new URL(urlString).getHost();
-            int firstDot = hostString.indexOf(".")+1;
-            int lastDot = hostString.lastIndexOf(".");
-            hostString = hostString.substring(firstDot, lastDot);
             return hostString;
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -47,6 +46,17 @@ public class WebWriter {
         }
     }
 
+    public String getLastSubpageName(String urlString) {
+
+        try {
+            return Paths.get(new URL(urlString).toURI()).getName(2).toString();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public ArrayList<String> getSubpages(String urlString) {
         ArrayList<String> subpages = new ArrayList<>();
@@ -56,19 +66,14 @@ public class WebWriter {
             String patternString = "<a\\s+href\\s*=\\s*(\"[^\"]*\"|[^\\d>]*)\\s*>";
             Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(content);
-            while (matcher.find())
-            {
+            while (matcher.find()) {
                 String match = matcher.group();
-                String hostString = match.substring(match.indexOf("\"")+1, match.lastIndexOf("\""));
+                String hostString = match.substring(match.indexOf("\"") + 1, match.lastIndexOf("\""));
                 subpages.add(hostString);
             }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return subpages;
-    }
-
-    public void recursiveMethod(URL url) {
-        urlList.add(url);
     }
 }

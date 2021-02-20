@@ -1,8 +1,7 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,10 +39,24 @@ public class WebWriterTest {
     }
 
     @Test
-    public void resolveNameTest() {
+    public void getHostNameFromHostTest() {
         String hostName = webWriter.getHostName("https://www.powiatleczynski.pl");
-        assertEquals("powiatleczynski", hostName);
+        assertEquals("www.powiatleczynski.pl", hostName);
         assertNotEquals("https://www.powiatleczynski.pl", hostName);
+    }
+
+    @Test
+    public void getHostNameFromSubpageTest() {
+        String hostName = webWriter.getHostName("https://www.powiatleczynski.pl/kontakt");
+        assertEquals("www.powiatleczynski.pl", hostName);
+    }
+
+    @Test
+    public void getSubpageName() {
+        String subpageName = webWriter.getLastSubpageName("https://www.powiatleczynski.pl/kontakt");
+        assertEquals("kontakt", subpageName);
+        subpageName = webWriter.getLastSubpageName("https://www.powiatleczynski.pl/gmina/gmina-cycow/");
+        System.out.println(subpageName);
     }
 
     @Test
@@ -58,15 +71,4 @@ public class WebWriterTest {
         //assertEquals(26, matcher.groupCount());
     }
 
-    @Test
-    public void recursiveMethod() {
-        try {
-            URL root = new URL("https://www.powiatleczynski.pl");
-            webWriter.recursiveMethod(root);
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-    }
 }
