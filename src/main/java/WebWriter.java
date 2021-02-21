@@ -5,6 +5,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class WebWriter {
     public byte[] bytes = new byte[0];
@@ -76,12 +78,14 @@ public class WebWriter {
     public boolean createHomePageDirectory() {
         return new File(rootDirectory).mkdirs();
     }
-   /* public ArrayList<String> getSubpages(String urlString) {
+
+   public ArrayList<String> getSubpages(String urlString) {
         ArrayList<String> subpages = new ArrayList<>();
-        read(urlString);
+        readWebsite(urlString);
         try {
             String content = new String(bytes, "UTF-8");
-            String patternString = "<a\\s+href\\s*=\\s*(\"[^\"]*\"|[^\\d>]*)\\s*>";
+            //String patternString = "<a\\s+href\\s*=\\s*(\"[^\"]*\"|[^\\d>]*)\\s*>"; //Old pattern from book
+            String patternString = "<a\\s+href\\s*=\\s*(\"[^\"]*\")\\s*>";
             Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(content);
             while (matcher.find()) {
@@ -94,6 +98,4 @@ public class WebWriter {
         }
         return subpages;
     }
-*/
-
 }

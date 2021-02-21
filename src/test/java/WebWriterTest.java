@@ -2,6 +2,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,15 +71,25 @@ public class WebWriterTest {
         assertFalse(webWriter.isFromSameHomePage(anotherSubpageString));
     }
 
-    /*@Test
-    public void getSubpages() {
+    @Test
+    public void htmlPatternTest() {
+
+        String patternString = "<a\\s+href\\s*=\\s*(\"[^\"]*\")\\s*>";
+        Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
+
+        String content = "<a href=\"oihasdojbewo-123-.html\">";
+        Matcher matcher = pattern.matcher(content);
+        assertTrue(matcher.find());
+
+        content = "<a    href=\"oinkerwojn\" oiwefjnko>";
+        matcher = pattern.matcher(content);
+        assertFalse(matcher.find());
+    }
+    @Test
+    public void getSubpagesStringList() {
         ArrayList<String> subpages = webWriter.getSubpages("https://www.powiatleczynski.pl");
         assertEquals(subpages.size(), 26);
-        String patternString = "http://[a-z\\./0-9\\-]";
-        Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(subpages.toString());
-        //assertEquals(26, matcher.groupCount());
-    }*/
+    }
 
     @Test
     public void createRootDirectory() {
