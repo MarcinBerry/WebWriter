@@ -78,9 +78,9 @@ public class WebWriter {
     public boolean createHomePageDirectory() {
         return new File(rootDirectory).mkdirs();
     }
-
-   public ArrayList<String> getSubpages(String urlString) {
-        ArrayList<String> subpages = new ArrayList<>();
+    //TODO dodawanie tylko podstron podanej wcześniej strony, a nie odnośnika do każdej storny
+   public ArrayList<String> appendSubpages(String urlString) {
+        ArrayList<String> subpagesList = new ArrayList<>();
         readWebsite(urlString);
         try {
             String content = new String(bytes, "UTF-8");
@@ -90,12 +90,13 @@ public class WebWriter {
             Matcher matcher = pattern.matcher(content);
             while (matcher.find()) {
                 String match = matcher.group();
-                String hostString = match.substring(match.indexOf("\"") + 1, match.lastIndexOf("\""));
-                subpages.add(hostString);
+                String subpageString = match.substring(match.indexOf("\"") + 1, match.lastIndexOf("\""));
+                if(subpagesList.stream().anyMatch(s -> s.equals(subpageString)));
+                    subpagesList.add(subpageString);
             }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return subpages;
+        return subpagesList;
     }
 }

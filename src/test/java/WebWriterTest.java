@@ -87,7 +87,7 @@ public class WebWriterTest {
     }
     @Test
     public void getSubpagesStringList() {
-        ArrayList<String> subpages = webWriter.getSubpages("https://www.powiatleczynski.pl");
+        ArrayList<String> subpages = webWriter.appendSubpages("https://www.powiatleczynski.pl");
         assertEquals(subpages.size(), 26);
     }
 
