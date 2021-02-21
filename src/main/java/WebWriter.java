@@ -3,6 +3,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -12,6 +14,8 @@ import java.util.stream.Stream;
 public class WebWriter {
     public byte[] bytes = new byte[0];
     ArrayList<URL> urlList = new ArrayList<>();
+    private String familyString;
+    private String rootDirectory = "C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\";
 
     public boolean read(String url) {
         try (InputStream in = new URL(url).openStream()) {
@@ -47,15 +51,31 @@ public class WebWriter {
     }
 
     public String getLastSubpageName(String urlString) {
-
         try {
-            return Paths.get(new URL(urlString).toURI()).getName(2).toString();
-        } catch (URISyntaxException e) {
+            URL url = new URL(urlString);
+            Path subpagesPath = Paths.get(url.toURI().getPath().substring(1));
+            int i = subpagesPath.getNameCount();
+            Path lastSubpagePath = subpagesPath.getName(i-1);
+            return lastSubpagePath.toString();
+        } catch (MalformedURLException | URISyntaxException e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void setFamily(String urlString) {
+        familyString = urlString;
+    }
+
+    public boolean isFromSameFamily(String urlString) {
+        try {
+            String familyHostString = new URL(familyString).getHost();
+            String newHostString = new URL(urlString).getHost();
+            return familyHostString.equals(newHostString);
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            return false;
         }
-        return null;
     }
 
     public ArrayList<String> getSubpages(String urlString) {
@@ -75,5 +95,13 @@ public class WebWriter {
             e.printStackTrace();
         }
         return subpages;
+    }
+
+    public void setRootDirectory(String rootDirectory) {
+        this.rootDirectory += rootDirectory;
+    }
+
+    public void createRootDirectory() {
+        new File(rootDirectory).mkdirs();
     }
 }

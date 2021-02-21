@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -52,23 +53,43 @@ public class WebWriterTest {
     }
 
     @Test
-    public void getSubpageName() {
+    public void getLastSubpageName() {
         String subpageName = webWriter.getLastSubpageName("https://www.powiatleczynski.pl/kontakt");
         assertEquals("kontakt", subpageName);
         subpageName = webWriter.getLastSubpageName("https://www.powiatleczynski.pl/gmina/gmina-cycow/");
-        System.out.println(subpageName);
+        assertEquals("gmina-cycow", subpageName);
+        subpageName = webWriter.getLastSubpageName("https://powiatleczynski.pl/2021/02/19/ostrzezenie-meteorologiczne-28/");
+        assertEquals("ostrzezenie-meteorologiczne-28", subpageName);
+    }
+
+    @Test
+    public void isFromFamily() {
+        String urlString = "https://www.powiatleczynski.pl/";
+        webWriter.setFamily(urlString);
+        String subpageString = "https://www.powiatleczynski.pl/kontakt";
+        assertTrue(webWriter.isFromSameFamily(subpageString));
+        subpageString = "https://www.youtube.com/watch?v=ikJE3skbyzc&list=RDMMRRnFG-5_Ces&index=2";
+        assertFalse(webWriter.isFromSameFamily(subpageString));
     }
 
     @Test
     public void getSubpages() {
         ArrayList<String> subpages = webWriter.getSubpages("https://www.powiatleczynski.pl");
         assertEquals(subpages.size(), 26);
-        System.out.println(subpages.get(0));
         String patternString = "http://[a-z\\./0-9\\-]";
         Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
-        System.out.println(subpages.toString());
         Matcher matcher = pattern.matcher(subpages.toString());
         //assertEquals(26, matcher.groupCount());
     }
 
+    @Test
+    public void createRootDirectory() {
+        String hostName = webWriter.getHostName("https://www.powiatleczynski.pl");
+        webWriter.setRootDirectory(hostName);
+        webWriter.createRootDirectory();
+        File rootDirectory = new File("C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\" + hostName);
+        assertTrue(rootDirectory.isDirectory());
+        if(rootDirectory.isDirectory())
+            rootDirectory.delete();
+    }
 }
