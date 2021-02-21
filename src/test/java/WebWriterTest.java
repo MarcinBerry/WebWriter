@@ -2,15 +2,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class WebWriterTest {
     WebWriter webWriter;
+    final String mainWebsite = "https://www.powiatleczynski.pl";
+    final String subpage = "https://www.powiatleczynski.pl/kontakt";
 
     @BeforeEach
     public void beforeAllTests() {
@@ -19,42 +17,42 @@ public class WebWriterTest {
 
     @Test
     public void readCorrectURLTest() {
-        assertTrue(webWriter.bytes.length == 0);
-        assertTrue(webWriter.read("https://www.powiatleczynski.pl"));
+        assertEquals(0, webWriter.bytes.length);
+        assertTrue(webWriter.readWebsite(mainWebsite));
         assertTrue(webWriter.bytes.length > 10);
     }
 
     @Test
     public void readIncorrectURLTest() {
-        assertTrue(webWriter.bytes.length == 0);
-        assertFalse(webWriter.read("https://ww.powiatleczynski.pl"));
-        assertTrue(webWriter.bytes.length == 0);
+        assertEquals(0, webWriter.bytes.length);
+        assertFalse(webWriter.readWebsite("https://ww.powiatleczynski.pl/"));
+        assertEquals(0, webWriter.bytes.length);
     }
     @Test
     public void writeWebTest() {
         String username = System.getProperty("user.name");
         boolean success = false;
-        if(webWriter.read("https://www.powiatleczynski.pl"))
-            success = webWriter.writeWeb("C:\\Users\\" + username + "\\Desktop\\Strona\\web.html");
+        if(webWriter.readWebsite(mainWebsite))
+            success = webWriter.writeWebsite("C:\\Users\\" + username + "\\Desktop\\Strona\\web.html");
         assertTrue(success);
     }
 
     @Test
     public void getHostNameFromHostTest() {
-        String hostName = webWriter.getHostName("https://www.powiatleczynski.pl");
+        String hostName = webWriter.getHomePageName(mainWebsite);
         assertEquals("www.powiatleczynski.pl", hostName);
         assertNotEquals("https://www.powiatleczynski.pl", hostName);
     }
 
     @Test
     public void getHostNameFromSubpageTest() {
-        String hostName = webWriter.getHostName("https://www.powiatleczynski.pl/kontakt");
+        String hostName = webWriter.getHomePageName(subpage);
         assertEquals("www.powiatleczynski.pl", hostName);
     }
 
     @Test
     public void getLastSubpageName() {
-        String subpageName = webWriter.getLastSubpageName("https://www.powiatleczynski.pl/kontakt");
+        String subpageName = webWriter.getLastSubpageName(subpage);
         assertEquals("kontakt", subpageName);
         subpageName = webWriter.getLastSubpageName("https://www.powiatleczynski.pl/gmina/gmina-cycow/");
         assertEquals("gmina-cycow", subpageName);
@@ -64,15 +62,13 @@ public class WebWriterTest {
 
     @Test
     public void isFromFamily() {
-        String urlString = "https://www.powiatleczynski.pl/";
-        webWriter.setFamily(urlString);
-        String subpageString = "https://www.powiatleczynski.pl/kontakt";
-        assertTrue(webWriter.isFromSameFamily(subpageString));
-        subpageString = "https://www.youtube.com/watch?v=ikJE3skbyzc&list=RDMMRRnFG-5_Ces&index=2";
-        assertFalse(webWriter.isFromSameFamily(subpageString));
+        webWriter.setHomePage(mainWebsite);
+        assertTrue(webWriter.isFromSameHomePage(subpage));
+        String anotherSubpageString = "https://www.youtube.com/watch?v=ikJE3skbyzc&list=RDMMRRnFG-5_Ces&index=2";
+        assertFalse(webWriter.isFromSameHomePage(anotherSubpageString));
     }
 
-    @Test
+    /*@Test
     public void getSubpages() {
         ArrayList<String> subpages = webWriter.getSubpages("https://www.powiatleczynski.pl");
         assertEquals(subpages.size(), 26);
@@ -80,16 +76,17 @@ public class WebWriterTest {
         Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(subpages.toString());
         //assertEquals(26, matcher.groupCount());
-    }
+    }*/
 
     @Test
     public void createRootDirectory() {
-        String hostName = webWriter.getHostName("https://www.powiatleczynski.pl");
-        webWriter.setRootDirectory(hostName);
-        webWriter.createRootDirectory();
+        String hostName = webWriter.getHomePageName(mainWebsite);
+        webWriter.setHomePageDirectory(hostName);
+        webWriter.createHomePageDirectory();
         File rootDirectory = new File("C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\" + hostName);
         assertTrue(rootDirectory.isDirectory());
         if(rootDirectory.isDirectory())
             rootDirectory.delete();
+
     }
 }
