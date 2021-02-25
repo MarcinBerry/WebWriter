@@ -2,6 +2,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +16,7 @@ public class WebWriterTest {
     WebWriter webWriter;
     final String mainWebsite = "https://www.powiatleczynski.pl";
     final String subpage = "https://www.powiatleczynski.pl/kontakt";
+    final String desktopDirectoryString = "C:\\Users\\"+System.getProperty("user.name") + "\\Desktop";
 
     @BeforeEach
     public void beforeAllTests() {
@@ -19,38 +24,27 @@ public class WebWriterTest {
     }
 
     @Test
-    public void readCorrectURLTest() {
-        assertEquals(0, webWriter.bytes.length);
-        assertTrue(webWriter.readWebsite(mainWebsite));
-        assertTrue(webWriter.bytes.length > 10);
+    public void readWebsiteTest() throws MalformedURLException {
+        URL url = new URL(mainWebsite);
+        String webString = webWriter.readWebsite(url);
+        assertFalse(webString.isEmpty());
     }
 
     @Test
-    public void readIncorrectURLTest() {
-        assertEquals(0, webWriter.bytes.length);
-        assertFalse(webWriter.readWebsite("https://ww.powiatleczynski.pl/"));
-        assertEquals(0, webWriter.bytes.length);
-    }
-    @Test
-    public void writeWebTest() {
-        String username = System.getProperty("user.name");
-        boolean success = false;
-        if(webWriter.readWebsite(mainWebsite))
-            success = webWriter.writeWebsite("C:\\Users\\" + username + "\\Desktop\\Strona\\web.html");
-        assertTrue(success);
+    public void writeWebsiteTest() throws MalformedURLException {
+        URL url = new URL("https://powiatleczynski.pl/wladze/zarzad-powiatu/");
+        webWriter.writeWebsite(url);
+        assertTrue(new File(desktopDirectoryString+"\\Strona\\powiatleczynski.pl\\wladze\\zarzad-powiatu.html").isFile());
     }
 
     @Test
-    public void getHostNameFromHostTest() {
-        String hostName = webWriter.getHomePageName(mainWebsite);
-        assertEquals("www.powiatleczynski.pl", hostName);
-        assertNotEquals("https://www.powiatleczynski.pl", hostName);
-    }
-
-    @Test
-    public void getHostNameFromSubpageTest() {
-        String hostName = webWriter.getHomePageName(subpage);
-        assertEquals("www.powiatleczynski.pl", hostName);
+    public void getPathFromWebsiteTest() throws MalformedURLException {
+        URL url = new URL("https://powiatleczynski.pl/wladze/zarzad-powiatu/");
+        Path path = webWriter.getPathFromWebsite(url);
+        assertTrue(path.equals(Paths.get("powiatleczynski.pl\\wladze\\zarzad-powiatu")));
+        url = new URL("https://powiatleczynski.pl/wladze/rada-powiatu/");
+        path = webWriter.getPathFromWebsite(url);
+        assertTrue(path.equals(Paths.get("powiatleczynski.pl\\wladze\\rada-powiatu")));
     }
 
     @Test
@@ -64,16 +58,24 @@ public class WebWriterTest {
     }
 
     @Test
-    public void isFromFamily() {
-        webWriter.setHomePage(mainWebsite);
-        assertTrue(webWriter.isFromSameHomePage(subpage));
-        String anotherSubpageString = "https://www.youtube.com/watch?v=ikJE3skbyzc&list=RDMMRRnFG-5_Ces&index=2";
-        assertFalse(webWriter.isFromSameHomePage(anotherSubpageString));
+    public void addURLtoList() throws MalformedURLException {
+        URL url = new URL("https://powiatleczynski.pl/");
+        webWriter.addURLtoList(url);
+        assertTrue(webWriter.getURLList().get(0).equals(new URL("https://powiatleczynski.pl/")));
+    }
+
+    @Test
+    public void isSubpageTest() throws MalformedURLException {
+        URL homePage = new URL("https://www.powiatleczynski.pl/");
+        webWriter.addURLtoList(homePage);
+        URL url = new URL(subpage);
+        assertTrue(webWriter.isSubpage(url));
+        URL url1 = new URL("https://calendar.google.com/");
+        assertFalse(webWriter.isSubpage(url1));
     }
 
     @Test
     public void htmlPatternTest() {
-
         String patternString = "<a\\s+href\\s*=\\s*(\"[^\"]*\")\\s*>";
         Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
 
@@ -88,18 +90,17 @@ public class WebWriterTest {
     @Test
     public void getSubpagesStringList() {
         ArrayList<String> subpages = webWriter.appendSubpages("https://www.powiatleczynski.pl");
-        assertEquals(subpages.size(), 26);
+        assertEquals(subpages.size(), 25);
     }
 
     @Test
-    public void createRootDirectory() {
-        String hostName = webWriter.getHomePageName(mainWebsite);
-        webWriter.setHomePageDirectory(hostName);
-        webWriter.createHomePageDirectory();
-        File rootDirectory = new File("C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\" + hostName);
-        assertTrue(rootDirectory.isDirectory());
-        if(rootDirectory.isDirectory())
-            rootDirectory.delete();
+    public void createDirectories() throws MalformedURLException {
+        URL url = new URL("https://www.powiatleczynski.pl/");
+        webWriter.createDirectories(url);
+        File directory = new File("C:\\Users\\" + System.getProperty("user.name") + "\\Desktop\\www.powiatleczynski.pl");
+        assertTrue(directory.isDirectory());
 
+        if(directory.isDirectory())
+            directory.delete();
     }
 }
