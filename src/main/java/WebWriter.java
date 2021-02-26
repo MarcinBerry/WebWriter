@@ -26,7 +26,11 @@ public class WebWriter {
 
     public boolean writeWebsite(URL url) {
         createDirectories(url);
-        File file = new File(desktopDirectory.toString() + "\\"+url.getFile() + ".html");
+        File file;
+            if(isHomePage(url))
+                file = new File(desktopDirectory + "\\" + url.getHost() + "\\" + url.getHost() + ".html");
+            else
+                file = new File(desktopDirectory + "\\" + url.getHost() + "\\" + getFileFrom(url));
         try (InputStream in = url.openStream();
              OutputStream out = new FileOutputStream(file)) {
             out.write(in.readAllBytes());
@@ -37,34 +41,27 @@ public class WebWriter {
         }
     }
 
-    public String getLastSubpageName(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            Path subpagesPath = Paths.get(url.toURI().getPath());
-            int i = subpagesPath.getNameCount();
-            Path lastSubpagePath = subpagesPath.getName(i-1);
-            return lastSubpagePath.toString();
-        } catch (MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
-            return null;
-        }
+    private boolean isHomePage(URL url) {
+        String file = url.getFile();
+        return file.equals("/") || file.equals("") ? true : false;
     }
 
     public boolean isSubpage(URL url) {
         return urlList.get(0).getHost().equals(url.getHost());
     }
 
+
     public boolean createDirectories(URL url) {
         File directory;
-        if (url.getFile().equals("/")) {
+        if (isHomePage(url)) {
             directory = new File(desktopDirectory + "\\" + url.getHost());
         } else {
-            directory = new File(desktopDirectory + "\\" + url.getFile());
+            directory = new File(desktopDirectory + "\\" +url.getHost() + "\\" + url.getFile());
         }
         return directory.mkdirs();
     }
-    //TODO dodawanie tylko podstron podanej wcześniej strony, a nie odnośnika do każdej storny
-    public ArrayList<String> appendSubpages(String urlString) {
+
+    public ArrayList<String> readAndAppendSubpagesFrom(String urlString) {
         ArrayList<String> subpagesList = new ArrayList<>();
         try {
             String content = readWebsite(new URL(urlString));
@@ -84,15 +81,6 @@ public class WebWriter {
         return subpagesList;
     }
 
-    public Path getPathFromWebsite(URL url) {
-        String urlString = url.toString();
-        urlString = urlString.substring(urlString.indexOf("//")+2,urlString.lastIndexOf("/"));
-        while(urlString.contains("/"))
-            urlString = urlString.replace("/", "\\");
-        //return Paths.get(desktopDirectory.toString() + "\\" + urlString);
-        return Paths.get(urlString);
-    }
-
     public List<URL> getURLList() {
         return urlList;
     }
@@ -100,5 +88,13 @@ public class WebWriter {
     public void addURLtoList(URL url) {
         if(!urlList.contains(url))
             urlList.add(url);
+    }
+
+    public File getFileFrom(URL url) {
+        File file;
+        if(url.getFile().endsWith("/").)
+
+
+        return desktopDirectory;
     }
 }
