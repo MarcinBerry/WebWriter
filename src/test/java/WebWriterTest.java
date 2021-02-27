@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,29 +38,30 @@ public class WebWriterTest {
     @Test
     public void writeHomepageTest() {
         webWriter.writeWebsite(homeWebsite);
-        File file = new File(desktopDirectory + "\\www.powiatleczynski.pl\\www.powiatleczynski.pl.html");
-        assertTrue(file.isFile());
-        if(file.isFile()){
-            file.delete();
-        }
-        File directory = new File(desktopDirectory + "\\www.powiatleczynski.pl\\www.powiatleczynski.pl.html");
+        File directory = new File(desktopDirectory + "\\www.powiatleczynski.pl");
         assertTrue(directory.isDirectory());
         if(directory.isDirectory())
             directory.delete();
+        File file = new File(desktopDirectory + "\\www.powiatleczynski.pl\\www.powiatleczynski.pl.html");
+        assertTrue(file.isFile());
+        if(file.isFile())
+            file.delete();
     }
 
     @Test
     public void writeSubpageTest() {
         webWriter.writeWebsite(firstSubpage);
-        File file = new File(desktopDirectory + "\\www.powiatleczynski.pl\\kontakt\\kontakt.html");
-        assertTrue(file.isFile());
-        if(file.isFile()){
-            file.delete();
-        }
         File directory = new File(desktopDirectory + "\\www.powiatleczynski.pl\\kontakt");
         assertTrue(directory.isDirectory());
-        if(directory.isDirectory())
+
+        File file = new File(desktopDirectory + "\\www.powiatleczynski.pl\\kontakt\\kontakt.html");
+        assertTrue(file.isFile());
+        if(file.isFile())
+            file.delete();
+        if(directory.isDirectory()) {
             directory.delete();
+            directory.getParentFile().delete();
+        }
     }
     @Test
     public void addURLtoList() throws MalformedURLException {
@@ -90,7 +90,7 @@ public class WebWriterTest {
     }
 
     @Test
-    public void createDirectoriesHomePageTest() {
+    public void createDirectoriesHomepageTest() {
         webWriter.createDirectories(homeWebsite);
         File directory = new File(desktopDirectory + "\\www.powiatleczynski.pl");
         assertTrue(directory.isDirectory());
@@ -108,10 +108,30 @@ public class WebWriterTest {
     }
 
     @Test
-    public void getFileFromTest() {
-        File filePath = webWriter.getFileFrom(firstSubpage);
-        assertTrue(filePath.equals(desktopDirectory +"\\www.powiatleczynski.pl\\kontakt\\kontakt.html"));
-        filePath = webWriter.getFileFrom(secondSubpage);
-        assertTrue(filePath.equals(desktopDirectory +"\\www.powiatleczynski.pl\\wladze\\zarzad-powiatu.html"));
+    public void getDirectoryPathFromFirstSubpageTest() {
+        File filePath = webWriter.getDirectoryPath(firstSubpage);
+        assertTrue(filePath.toString().equals(desktopDirectory +"\\www.powiatleczynski.pl\\kontakt"));
     }
+
+    @Test
+    public void getDirectoryPathFromSecondSubpageTest() {
+        File filePath = webWriter.getDirectoryPath(secondSubpage);
+        assertTrue(filePath.toString().equals(desktopDirectory +"\\www.powiatleczynski.pl\\wladze\\zarzad-powiatu"));
+    }
+
+    @Test
+    public void getDirectoryPathFromHomepageTest() {
+        File filePath = webWriter.getDirectoryPath(homeWebsite);
+        assertTrue(filePath.toString().equals(desktopDirectory +"\\www.powiatleczynski.pl"));
+    }
+
+    @Test
+    public void getFileNameTest() {
+        String fileName = webWriter.getFileName(homeWebsite);
+        assertTrue(fileName.equals("\\www.powiatleczynski.pl.html"));
+        fileName = webWriter.getFileName(firstSubpage);
+        assertTrue(fileName.equals("\\kontakt.html"));
+    }
+
+
 }

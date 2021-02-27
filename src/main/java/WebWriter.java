@@ -1,12 +1,9 @@
 import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,11 +23,7 @@ public class WebWriter {
 
     public boolean writeWebsite(URL url) {
         createDirectories(url);
-        File file;
-            if(isHomePage(url))
-                file = new File(desktopDirectory + "\\" + url.getHost() + "\\" + url.getHost() + ".html");
-            else
-                file = new File(desktopDirectory + "\\" + url.getHost() + "\\" + getFileFrom(url));
+        File file = Paths.get(getDirectoryPath(url).getPath() + getFileName(url)).toFile();
         try (InputStream in = url.openStream();
              OutputStream out = new FileOutputStream(file)) {
             out.write(in.readAllBytes());
@@ -39,6 +32,12 @@ public class WebWriter {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public String getFileName(URL url) {
+        String fileName = getDirectoryPath(url).toString();
+        fileName = fileName.substring(fileName.lastIndexOf("\\"))+".html";
+        return fileName;
     }
 
     private boolean isHomePage(URL url) {
@@ -50,14 +49,8 @@ public class WebWriter {
         return urlList.get(0).getHost().equals(url.getHost());
     }
 
-
     public boolean createDirectories(URL url) {
-        File directory;
-        if (isHomePage(url)) {
-            directory = new File(desktopDirectory + "\\" + url.getHost());
-        } else {
-            directory = new File(desktopDirectory + "\\" +url.getHost() + "\\" + url.getFile());
-        }
+        File directory = getDirectoryPath(url);
         return directory.mkdirs();
     }
 
@@ -90,11 +83,14 @@ public class WebWriter {
             urlList.add(url);
     }
 
-    public File getFileFrom(URL url) {
-        File file;
-        if(url.getFile().endsWith("/").)
+    public File getDirectoryPath(URL url) {
+        String urlString = url.getFile();
+        if(url.getFile().equals("/") || url.getFile().equals(""))
+            return Paths.get(desktopDirectory + "\\" + url.getHost()).toFile();
 
-
-        return desktopDirectory;
+        if(urlString.endsWith("/")) {
+            urlString = url.getFile().substring(0, urlString.lastIndexOf("/"));
+        }
+        return Paths.get(desktopDirectory + "\\" + url.getHost() + "\\" + urlString).toFile();
     }
 }
