@@ -135,7 +135,7 @@ public class WebWriterTest {
 
     @Test
     public void appendSubpagesFromTest() {
-        webWriter.appendSubpagesFrom(homeWebsite);
+        webWriter.resolveSubpagesFrom(homeWebsite);
         assertEquals(25, webWriter.getURLList().size());
     }
 }

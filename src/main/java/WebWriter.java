@@ -55,7 +55,7 @@ public class WebWriter {
         return directory.mkdirs();
     }
 
-    public void appendSubpagesFrom(URL url) {
+    public void resolveSubpagesFrom(URL url) {
         String content = readWebsite(url);
         //String patternString = "<a\\s+href\\s*=\\s*(\"[^\"]*\"|[^\\d>]*)\\s*>"; //Old pattern from book
         String patternString = "<a\\s+href\\s*=\\s*(\"[^\"]*\")\\s*>";
@@ -64,16 +64,21 @@ public class WebWriter {
         while (matcher.find()) {
             String match = matcher.group();
             String subpageString = match.substring(match.indexOf("\"") + 1, match.lastIndexOf("\""));
-            if (urlList.stream().noneMatch(s -> s.toString().equals(subpageString))) ;
-            try {
-                String stringTemp = subpageString;
-                if(!subpageString.startsWith("https") || !subpageString.startsWith("http"))
-                    stringTemp = url.getProtocol() + "://" + url.getHost() + "/" + subpageString;
-                urlList.add(new URL(stringTemp));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
+            if(!subpageString.startsWith("https") || !subpageString.startsWith("http"))
+                subpageString = url.getProtocol() + "://" + url.getHost() + "/" + subpageString;
+            String tempString = subpageString;
+            if (urlList.stream().noneMatch(s -> s.toString().equals(tempString))) {
+                try {
+                    urlList.add(new URL(tempString));
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
             }
         }
+    }
+
+    private URL resolveStringToURL(String string) {
+
     }
 
     public List<URL> getURLList() {
