@@ -66,7 +66,7 @@ public class WebWriterTest {
     @Test
     public void addURLtoList() throws MalformedURLException {
         webWriter.addURLtoList(homeWebsite);
-        assertTrue(webWriter.getURLList().get(0).toString().equals(new URL("https://www.powiatleczynski.pl").toString()));
+        assertEquals(new URL("https://www.powiatleczynski.pl").toString(), webWriter.getURLList().get(0).toString());
     }
 
     @Test
@@ -110,28 +110,32 @@ public class WebWriterTest {
     @Test
     public void getDirectoryPathFromFirstSubpageTest() {
         File filePath = webWriter.getDirectoryPath(firstSubpage);
-        assertTrue(filePath.toString().equals(desktopDirectory +"\\www.powiatleczynski.pl\\kontakt"));
+        assertEquals(desktopDirectory + "\\www.powiatleczynski.pl\\kontakt", filePath.toString());
     }
 
     @Test
     public void getDirectoryPathFromSecondSubpageTest() {
         File filePath = webWriter.getDirectoryPath(secondSubpage);
-        assertTrue(filePath.toString().equals(desktopDirectory +"\\www.powiatleczynski.pl\\wladze\\zarzad-powiatu"));
+        assertEquals(desktopDirectory + "\\www.powiatleczynski.pl\\wladze\\zarzad-powiatu", filePath.toString());
     }
 
     @Test
     public void getDirectoryPathFromHomepageTest() {
         File filePath = webWriter.getDirectoryPath(homeWebsite);
-        assertTrue(filePath.toString().equals(desktopDirectory +"\\www.powiatleczynski.pl"));
+        assertEquals(desktopDirectory + "\\www.powiatleczynski.pl", filePath.toString());
     }
 
     @Test
     public void getFileNameTest() {
         String fileName = webWriter.getFileName(homeWebsite);
-        assertTrue(fileName.equals("\\www.powiatleczynski.pl.html"));
+        assertEquals(fileName, "\\www.powiatleczynski.pl.html");
         fileName = webWriter.getFileName(firstSubpage);
-        assertTrue(fileName.equals("\\kontakt.html"));
+        assertEquals(fileName, "\\kontakt.html");
     }
 
-
+    @Test
+    public void appendSubpagesFromTest() {
+        webWriter.appendSubpagesFrom(homeWebsite);
+        assertEquals(25, webWriter.getURLList().size());
+    }
 }
