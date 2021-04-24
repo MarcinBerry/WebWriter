@@ -77,9 +77,9 @@ public class WebWriter {
         }
     }
 
-    private URL resolveStringToURL(String string) {
+    /*private URL resolveStringToURL(String string) {
 
-    }
+    }*/
 
     public List<URL> getURLList() {
         return urlList;
